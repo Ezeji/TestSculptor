@@ -1,0 +1,14 @@
+src/TestSculptor/bin/
+src/TestSculptorTests/bin/
+src/TestSculptorDownloader/bin/
+src/packages/
+obj/
+*ReSharper*
+*.suo
+*.dotCover
+*.user
+~$*
+*/StyleCop.Cache
+*.nupkg
+**/.vs
+.idea/
