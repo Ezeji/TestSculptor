@@ -15,10 +15,10 @@ First, create a folder in your system(local or virtual machine) following the be
 2. For MacOS: Create a folder named 'TestSculptorScripts' in the directory path - "/Users/[Username]".
 3. For Linux: Create a folder named 'TestSculptorScripts' in the directory path - "/home/[Username]".
 
-After the folder is created, copy the sample script for your database engine of choice found at https://github.com/Ezeji/TestSculptor/tree/master/src/TestSculptor/Scripts and paste that copy into the created folder from the previous step.
+After the folder is created, copy the sample script for your database engine of choice found at [Scripts](https://github.com/Ezeji/TestSculptor/tree/master/src/TestSculptor/Scripts) and paste that copy into the created folder from the previous step.
 
 Next is to create a folder where your database schemas will live and they'll be referenced from the copied script that lives in the root folder named 'TestSculptorScripts'. The new folder to be created within 'TestSculptorScripts' folder should be named 'schema'. The overall folder structure should look like this:
-```plaintext
+```
 /TestSculptorScripts
  ├── install-sqlserver.sql    [Copied script for SQL Server]
  └── /schema
@@ -66,7 +66,7 @@ public class TestAppSharedFixtureCollection : ICollectionFixture<TestAppSharedFi
     // ICollectionFixture<> interfaces.
 }
 ```
-You can find a detailed guide regarding the needed setup for your test project here: https://github.com/Ezeji/TestSculptor/tree/master/src/TestAppTests/Setup
+You can find a detailed guide regarding the needed setup for your test project at [Setup](https://github.com/Ezeji/TestSculptor/tree/master/src/TestAppTests/Setup)
 
 To carryout functional testing, ensure to configure TestSculptor in the startup of your application as seen below:
 
