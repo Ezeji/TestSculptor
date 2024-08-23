@@ -1,6 +1,7 @@
+src/TestApp/bin/
+src/TestAppTests/bin/
 src/TestSculptor/bin/
 src/TestSculptorTests/bin/
-src/TestSculptorDownloader/bin/
 src/packages/
 obj/
 *ReSharper*
