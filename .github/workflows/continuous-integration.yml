@@ -9,7 +9,7 @@ on:
       - master
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout git repository
       uses: actions/checkout@v2
@@ -22,7 +22,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build solution
-      run: dotnet build --verbosity normal
+      run: dotnet build --no-restore --configuration Release
     - name: Run Unit Tests
       run: dotnet test --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
     - name: Pack solution
