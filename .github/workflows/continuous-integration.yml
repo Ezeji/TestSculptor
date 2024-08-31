@@ -22,7 +22,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build solution
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --no-restore --configuration Release --verbosity detailed
     - name: Run Unit Tests
       run: dotnet test --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
     - name: Pack solution
