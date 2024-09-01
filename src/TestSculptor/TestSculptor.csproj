@@ -12,7 +12,7 @@
     <PackageProjectUrl>https://www.nuget.org/packages/TestSculptor</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ezeji/TestSculptor</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>nuget-logo.png</PackageIcon>
+    <PackageIcon>src\nuget-logo.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <OutputType>Library</OutputType>
     <IsPackable>True</IsPackable>
