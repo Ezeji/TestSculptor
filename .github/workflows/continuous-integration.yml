@@ -28,9 +28,10 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Display directory structure
+      shell: pwsh
       run: |
-        dir /s
-        echo "Current directory: $pwd"
+        Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse | Select-Object FullName
+        Write-Output "Current directory: $PWD"
 
     - name: Restore dependencies
       run: dotnet restore
@@ -42,12 +43,14 @@ jobs:
       run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
 
     - name: Pack
+      shell: pwsh
       run: |
-        mkdir -p ./artifacts
+        New-Item -Path ./artifacts -ItemType Directory -Force
         dotnet pack --configuration ${{ env.CONFIGURATION }} --no-build --output ./artifacts
 
     - name: List artifacts
-      run: dir /s ./artifacts
+      shell: pwsh
+      run: Get-ChildItem -Path ./artifacts -Recurse | Select-Object FullName
 
     - name: Push to NuGet
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
