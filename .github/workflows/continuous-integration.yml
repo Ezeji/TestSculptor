@@ -19,14 +19,36 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 8.0.x
-    - name: Clear NuGet cache
-      run: nuget locals all -clear
+    - name: Display .NET Information
+      run: |
+        dotnet --info
+        dotnet --list-sdks
+        dotnet --list-runtimes
+    - name: List Project Files
+      run: Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object { $_.FullName }
+    - name: Display Project File Contents
+      run: |
+        Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {
+          Write-Host "Contents of $($_.FullName):"
+          Get-Content $_.FullName
+          Write-Host "----------------------"
+        }
     - name: Restore dependencies
       run: dotnet restore
+    - name: Modify csproj file
+      run: |
+        $files = Get-ChildItem -Recurse -Filter *.csproj
+        foreach ($file in $files) {
+          $content = Get-Content $file.FullName -Raw
+          $content = $content -replace '<PackageOutputPath>.*?</PackageOutputPath>', '<PackageOutputPath>$(MSBuildProjectDirectory)\nupkgs</PackageOutputPath>'
+          $content | Set-Content $file.FullName
+        }
     - name: Run Unit Tests
       run: dotnet test --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
     - name: Build and Pack
-      run: dotnet pack --configuration Release --output ./out --verbosity detailed
+      run: dotnet pack --configuration Release --verbosity detailed
+    - name: List Output Directory
+      run: Get-ChildItem -Recurse -Path D:\a\TestSculptor
     - name: Push to NuGet
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: dotnet nuget push ./out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
