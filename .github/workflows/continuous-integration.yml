@@ -3,52 +3,35 @@ name: Continuous Integration
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
     branches:
       - master
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  CONFIGURATION: 'Release'
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Checkout git repository
-      uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 8.0.x
-    - name: Display .NET Information
-      run: |
-        dotnet --info
-        dotnet --list-sdks
-        dotnet --list-runtimes
-    - name: List Project Files
-      run: Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object { $_.FullName }
-    - name: Display Project File Contents
-      run: |
-        Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {
-          Write-Host "Contents of $($_.FullName):"
-          Get-Content $_.FullName
-          Write-Host "----------------------"
-        }
+        dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Restore dependencies
       run: dotnet restore
-    - name: Modify csproj file
-      run: |
-        $files = Get-ChildItem -Recurse -Filter *.csproj
-        foreach ($file in $files) {
-          $content = Get-Content $file.FullName -Raw
-          $content = $content -replace '<PackageOutputPath>.*?</PackageOutputPath>', '<PackageOutputPath>$(MSBuildProjectDirectory)\nupkgs</PackageOutputPath>'
-          $content | Set-Content $file.FullName
-        }
-    - name: Run Unit Tests
-      run: dotnet test --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
-    - name: Build and Pack
-      run: dotnet pack --configuration Release --verbosity detailed
-    - name: List Output Directory
-      run: Get-ChildItem -Recurse -Path D:\a\TestSculptor
+    - name: Build solution
+      run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+    - name: Run unit tests
+      run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
+    - name: Pack solution
+      run: dotnet pack --configuration ${{ env.CONFIGURATION }} --no-build --output ./artifacts
     - name: Push to NuGet
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: dotnet nuget push ./out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
+      run: dotnet nuget push ./artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
