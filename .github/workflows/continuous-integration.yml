@@ -33,11 +33,26 @@ jobs:
         Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse | Select-Object FullName
         Write-Output "Current directory: $PWD"
 
+    - name: Create Downloads directory
+      shell: pwsh
+      run: New-Item -Path "D:\a\TestSculptor\Downloads" -ItemType Directory -Force
+
+    - name: Display project file content
+      shell: pwsh
+      run: |
+        $projectFile = "D:\a\TestSculptor\TestSculptor\src\TestSculptor\TestSculptor.csproj"
+        if (Test-Path $projectFile) {
+          Get-Content $projectFile
+        } else {
+          Write-Output "Project file not found at expected location"
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.csproj | Select-Object FullName
+        }
+
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build
-      run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+    - name: Build with detailed output
+      run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore --verbosity detailed
 
     - name: Run unit tests
       run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
@@ -46,7 +61,7 @@ jobs:
       shell: pwsh
       run: |
         New-Item -Path ./artifacts -ItemType Directory -Force
-        dotnet pack --configuration ${{ env.CONFIGURATION }} --no-build --output ./artifacts
+        dotnet pack --configuration ${{ env.CONFIGURATION }} --no-build --output ./artifacts --verbosity detailed
 
     - name: List artifacts
       shell: pwsh
