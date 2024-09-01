@@ -15,23 +15,40 @@ env:
 jobs:
   build:
     runs-on: windows-latest
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Display directory structure
+      run: |
+        dir /s
+        echo "Current directory: $pwd"
+
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build solution
+
+    - name: Build
       run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+
     - name: Run unit tests
       run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal --filter "FullyQualifiedName!~TestSculptorTests.TraditionalDatabases"
-    - name: Pack solution
-      run: dotnet pack --configuration ${{ env.CONFIGURATION }} --no-build --output ./artifacts
+
+    - name: Pack
+      run: |
+        mkdir -p ./artifacts
+        dotnet pack --configuration ${{ env.CONFIGURATION }} --no-build --output ./artifacts
+
+    - name: List artifacts
+      run: dir /s ./artifacts
+
     - name: Push to NuGet
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       run: dotnet nuget push ./artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
