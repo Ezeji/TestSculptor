@@ -34,4 +34,17 @@ jobs:
       run: dotnet pack --configuration ${{ env.CONFIGURATION }} --no-build --output ./artifacts
     - name: Push to NuGet
       if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      run: dotnet nuget push ./artifacts/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      run: |
+        $packages = Get-ChildItem -Path .\artifacts -Recurse -Filter *.nupkg
+        if ($packages.Count -eq 0) {
+          Write-Error "No .nupkg files found in artifacts directory"
+          exit 1
+        }
+        foreach ($package in $packages) {
+          Write-Host "Pushing package: $($package.FullName)"
+          dotnet nuget push $package.FullName --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+          if ($lastexitcode -ne 0) {
+            Write-Error "Failed to push package: $($package.FullName)"
+            exit 1
+          }
+        }
